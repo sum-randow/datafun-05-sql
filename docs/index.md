@@ -50,9 +50,62 @@ This adds a data quality check to the pipeline before any queries run, catching 
 
 Executed successfully through uv run command.
 
-### Phase 5 Custom Project
+## Phase 5: Custom Project — Shelter Domain (DuckDB)
 
-Describe the custom pipeline you built for your chosen non-retail domain.
-Include the SQL files you created, the Python script you wrote,
-the database generated in `artifacts/`,
-and at a minimum one custom query result you found interesting.
+### Domain Overview
+This project implements a data pipeline for the **shelter domain**,
+modeling animal shelters and their adoption outcomes.
+
+**Two entities and their relationship:**
+- **Shelter** (parent) — represents a physical animal shelter location
+  with attributes: `shelter_id`, `shelter_name`, `city`, and `capacity`
+- **Adoption** (child) — represents a single animal outcome at a shelter
+  with attributes: `adoption_id`, `shelter_id`, `animal_type`, `outcome`,
+  `fee`, and `adopt_date`
+- **Relationship:** 1-to-many — one shelter can have many adoptions,
+  but each adoption belongs to exactly one shelter, enforced via the
+  `shelter_id` foreign key
+
+---
+
+### Files Created
+
+**SQL files in `sql/duckdb/`:**
+- `randow_shelter_bootstrap.sql` — drops, recreates, and loads both tables from CSV
+- `randow_shelter_clean.sql` — validates data quality (orphaned records, missing values, negative fees)
+- `randow_shelter_query_shelter_count.sql` — lists all shelters and their capacities
+- `randow_shelter_query_adoptions_by_type.sql` — counts adoptions and revenue by animal type
+- `randow_shelter_query_revenue_by_shelter.sql` — joins shelter and adoption to compare revenue by location
+
+**Python script:**
+- `src/datafun/app_shelter_duckdb_randow.py` — orchestrates the full pipeline: bootstrap, clean, and run queries
+
+**Generated database:**
+- `artifacts/duckdb/shelter.duckdb`
+
+---
+
+### Custom Query
+```sql
+-- Which cities have the highest average adoption fee?
+SELECT s.city,
+       AVG(a.fee)          AS avg_fee,
+       COUNT(a.adoption_id) AS total_adoptions
+FROM shelter s
+JOIN adoption a ON s.shelter_id = a.shelter_id
+WHERE a.outcome = 'Adoption'
+GROUP BY s.city
+ORDER BY avg_fee DESC;
+```
+This query answers: *"Are adoption fees consistent across cities,
+or do some markets charge more?"*
+
+---
+
+### When SQL is Better Than Pandas
+SQL is the better tool for this domain because the data lives across
+two related tables that need to be joined. SQL is purpose-built for
+joining, filtering, and aggregating relational data directly in the
+database — efficiently and without loading everything into memory.
+When the question involves relationships between tables, SQL is almost
+always the cleaner and faster choice.
