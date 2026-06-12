@@ -129,6 +129,8 @@ uvx pre-commit run --all-files
 uv run python -m datafun.app_retail_duckdb_case
 uv run python -m datafun.app_retail_sqlite_case
 
+uv run python -m datafun.app_retail_sqlite_sum-randow
+
 # do chores
 uv run ruff format .
 uv run ruff check . --fix
@@ -159,19 +161,18 @@ You accidentally started Python interactive mode.
 It happens.
 Press `Ctrl+c` (both keys together) or `Ctrl+Z` then `Enter` on Windows.
 
-## DuckDB Example Output (Replace This with Yours and Describe)
+## SQLite Example Output
 
 ```shell
-| INFO | P05 | RUN SQL query: C:\Repos\datafun\datafun-05-sql\sql\duckdb\case_retail_query_sales_by_category.sql
 | INFO | P05 | ====================================
-| INFO | P05 | case_retail_query_sales_by_category.sql
+| INFO | P05 | randow_retail_query_top_products.sql
 | INFO | P05 | ====================================
-| INFO | P05 | product_category, sale_count, total_revenue, avg_sale_amount
-| INFO | P05 | Outdoors, 9, 3200.0, 355.56
-| INFO | P05 | Clothing, 10, 1375.0, 137.5
-| INFO | P05 | Food, 11, 652.0, 59.27
+| INFO | P05 | product_category, total_sales
+| INFO | P05 | Outdoors, 3200.0
+| INFO | P05 | Clothing, 1375.0
+| INFO | P05 | Food, 652.0
 | INFO | P05 |
-| INFO | P05 | RUN SQL query: C:\Repos\datafun\datafun-05-sql\sql\duckdb\case_retail_query_kpi_revenue.sql
+| INFO | P05 | RUN SQL query: /Users/shackleton/datafun-05-sql/sql/sqlite/case_retail_query_kpi_revenue.sql
 | INFO | P05 | ====================================
 | INFO | P05 | case_retail_query_kpi_revenue.sql
 | INFO | P05 | ====================================
