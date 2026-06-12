@@ -31,9 +31,9 @@ Identify the two related tables and explain the 1-to-many relationship between t
 
 ### Phase 4 Initial Modifications
 
-I made two technical changes.
-First - Addeda. enw SQL query file and run_sql_query() call
-  Created a SLQ query with a SELECT statement that sums sales by product category, ordered highest to lowest, liminted to 10 results
+I made two technical changes:
+First - Added a new SQL query file and run_sql_query() call
+  Created a SLQ query with a SELECT statement that sums sales by product category, ordered highest to lowest, limited to 10 results
     SELECT product_category, SUM(sale_amount) AS total_sales
     FROM sale
     GROUP BY product_category
@@ -41,7 +41,12 @@ First - Addeda. enw SQL query file and run_sql_query() call
     LIMIT 10;
   Added a matching command call in Step 3 of the Python script to execute the query
     run_sql_query(con, SLQ_DIR / "randow_retail_query_top_products.sql")
-This extends the pipeline's reporting capability by answering the business question "Which product categories are generating the msot revenue?"
+This extends the pipeline's reporting capability by answering the business question "Which product categories are generating the most revenue?"
+
+Second- Added a COUNT* row verification after the CSV Load
+  Added inline Python code in Step 2 that queries COUNT(*) from both teh store and sale tables and compares those counts against the number of rows in the source CSV file
+  Used assert statements to stop the pipeline if the counts do not match, and LOG.info() to record the results.
+This adds a data quality check to the pipeline before any queries run, catching load errors early rather than letting bad data flow downstream.
 
 Executed successfully through uv run command.
 
