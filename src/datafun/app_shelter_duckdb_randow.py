@@ -107,6 +107,30 @@ def main():
     LOG.info("=" * 60)
     run_sql_query(con, SQL_DIR / "randow_shelter_query_revenue_by_shelter.sql")
 
+    # ============================================================
+    # STEP 5: EXPORT PROCESSED DATA
+    # ============================================================
+    PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
+    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+
+    df_adoption = con.execute("SELECT * FROM adoption").fetchdf()
+    df_adoption.to_csv(
+        PROCESSED_DIR / "randow_shelter_adoption_processed.csv", index=False
+    )
+    LOG.info("Exported: randow_shelter_adoption_processed.csv")
+
+    df_summary = con.execute("""
+        SELECT s.shelter_name, s.city, s.capacity,
+               COUNT(a.adoption_id) AS total_adoptions,
+               SUM(a.fee)           AS total_revenue
+        FROM shelter s
+        LEFT JOIN adoption a ON s.shelter_id = a.shelter_id
+        GROUP BY s.shelter_id, s.shelter_name, s.city, s.capacity
+        ORDER BY total_revenue DESC
+    """).fetchdf()
+    df_summary.to_csv(PROCESSED_DIR / "randow_shelter_summary.csv", index=False)
+    LOG.info("Exported: randow_shelter_summary.csv")
+
     con.close()
     log_header(LOG, "DONE: shelter DuckDB pipeline")
 
